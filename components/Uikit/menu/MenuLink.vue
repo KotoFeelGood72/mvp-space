@@ -1,9 +1,6 @@
 <template>
-  <div class="menu-link" :style="{ color: menuColor }">
+  <div class="menu-link">
     <NuxtLink :to="menuLink">
-      <div>
-        <Icon :name="menuIcon" />
-      </div>
       <p><slot /></p>
     </NuxtLink>
   </div>
@@ -12,8 +9,6 @@
 <script setup lang="ts">
 const props = defineProps<{
   menuLink: string;
-  menuIcon: string;
-  menuColor: string;
 }>();
 </script>
 

@@ -1,111 +1,130 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from "vue";
 import Logo from "@/components/Uikit/Visuals/Logo.vue";
 import MenuLink from "@/components/Uikit/menu/MenuLink.vue";
-import Buttons from "@/components/Uikit/Buttons/Buttons.vue";
-import IconButtons from "../Uikit/Buttons/IconButtons.vue";
 
-interface MenuItem {
-  menuLink: string;
-  menuName: string;
-  menuIcon: string;
-  menuColor: string;
-}
-
-const menuList: MenuItem[] = [
+const menuList = [
+  { menuLink: "/lofts", menuName: "Выбрать зал" },
+  { menuLink: "/basg", menuName: "Bash+" },
+  { menuLink: "/sales", menuName: "Акции" },
+  { menuLink: "/ideas", menuName: "Идеи" },
+  { menuLink: "/afisha", menuName: "Афиша" },
+  { menuLink: "/event", menuName: "Event-услуги" },
   {
-    menuLink: "/lofts",
-    menuName: "Лофты",
-    menuIcon: "mdi:warehouse",
-    menuColor: "#66C966",
+    menuLink: "/",
+    menuName: "Ещё",
+    children: [
+      { menuLink: "/likes", menuName: "Избранное" },
+      { menuLink: "/view", menuName: "Вы смотрели" },
+      { menuLink: "/contacts", menuName: "Контакты" },
+    ],
   },
-  {
-    menuLink: "/offices",
-    menuName: "Кабинеты",
-    menuIcon: "mdi:office-building",
-    menuColor: "#76C0A1",
-  },
-  {
-    menuLink: "/coworkings",
-    menuName: "Коворкинги",
-    menuIcon: "mdi:account-group",
-    menuColor: "#58C5F8",
-  },
-  {
-    menuLink: "/halls",
-    menuName: "Залы",
-    menuIcon: "mdi:conference",
-    menuColor: "#F7C23A",
-  },
-  {
-    menuLink: "/photo-studios",
-    menuName: "Фотостудии",
-    menuIcon: "mdi:camera-outline",
-    menuColor: "#335FFF",
-  },
-  {
-    menuLink: "/sport",
-    menuName: "Спорт",
-    menuIcon: "mdi:run",
-    menuColor: "#FF7A30",
-  },
-  {
-    menuLink: "/beauty",
-    menuName: "Бьюти",
-    menuIcon: "mdi:lipstick",
-    menuColor: "#E91E63",
-  },
-  {
-    menuLink: "/banquet-halls",
-    menuName: "Банкетные залы",
-    menuIcon: "mdi:glass-champagne",
-    menuColor: "#795548",
-  },
+  { menuLink: "/add-places", menuName: "Добавить площадку" },
 ];
 
-const actionsLink = ref<any>([
-  { name: "mage:message-round", link: "/" },
-  { name: "solar:heart-outline", link: "/" },
-]);
+const open = ref<number | null>(null);
+
+function toggle(i: number) {
+  open.value = open.value === i ? null : i;
+}
+
+function handleOutside(e: MouseEvent) {
+  const target = e.target as HTMLElement;
+  if (!target.closest("#header-menu")) open.value = null;
+}
+onMounted(() => window.addEventListener("click", handleOutside));
+onUnmounted(() => window.removeEventListener("click", handleOutside));
 </script>
 
 <template>
   <header id="header">
     <div class="container">
       <Logo />
+
       <nav id="header-menu">
-        <MenuLink
-          v-for="(item, i) in menuList"
-          :key="'header-nav-menu-item' + i"
-          :menuLink="item.menuLink"
-          :menuIcon="item.menuIcon"
-          :menuColor="item.menuColor"
-          >{{ item.menuName }}
-        </MenuLink>
+        <div v-for="(item, i) in menuList" :key="'menu-item-' + i" class="menu-item">
+          <MenuLink
+            :menuLink="item.menuLink"
+            class="menu-link"
+            @click.stop="item.children ? toggle(i) : null"
+          >
+            {{ item.menuName }}
+            <span v-if="item.children" class="chevron">▾</span>
+          </MenuLink>
+
+          <!-- выпадающий список -->
+          <ul
+            v-if="item.children"
+            class="dropdown"
+            :class="{ show: open === i }"
+            @click.stop
+          >
+            <li
+              v-for="(child, j) in item.children"
+              :key="'submenu-' + j"
+              class="dropdown-item"
+            >
+              <MenuLink :menuLink="child.menuLink">
+                {{ child.menuName }}
+              </MenuLink>
+            </li>
+          </ul>
+        </div>
       </nav>
-      <Buttons buttonName="Арендодателям" />
-      <div>
-        <IconButtons
-          v-for="(item, i) in actionsLink"
-          :iconLink="item.link"
-          :iconName="item.name"
-          :key="'action-links-' + i"
-        />
-      </div>
-      <div>
-        <IconButtons iconName="iconamoon:menu-burger-horizontal" />
-      </div>
+
+      <!-- “Войти” -->
+      <NuxtLink to="/" class="auth">
+        <div class="icon">
+          <Icon name="stash:signin-light" />
+        </div>
+        <p>Войти</p>
+      </NuxtLink>
     </div>
   </header>
 </template>
 
 <style scoped>
-/* При необходимости добавьте стили для иконок и текста */
 #header-menu {
   display: flex;
   gap: 1.5rem;
 }
-#header-menu span {
-  margin-left: 0.5rem;
-  font-weight: 600;
+.menu-item {
+  position: relative;
+}
+.chevron {
+  margin-left: 0.25rem;
+}
+
+/* дропдаун */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  padding: 0.5rem 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 100;
+}
+.dropdown.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.dropdown-item {
+  padding: 0 0.75rem;
+  white-space: nowrap;
+}
+.dropdown-item + .dropdown-item {
+  margin-top: 0.25rem;
+}
+.dropdown-item a {
+  display: block;
+  padding: 0.25rem 0;
 }
 </style>
