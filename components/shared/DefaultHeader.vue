@@ -38,10 +38,10 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
 
 <template>
   <header id="header">
-    <div class="container">
+    <div class="container flex items-center justify-between py-6">
       <Logo />
 
-      <nav id="header-menu">
+      <nav id="header-menu" class="flex items-center justify-center gap-6">
         <div v-for="(item, i) in menuList" :key="'menu-item-' + i" class="menu-item">
           <MenuLink
             :menuLink="item.menuLink"
@@ -51,8 +51,6 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
             {{ item.menuName }}
             <span v-if="item.children" class="chevron">▾</span>
           </MenuLink>
-
-          <!-- выпадающий список -->
           <ul
             v-if="item.children"
             class="dropdown"
@@ -73,9 +71,9 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
       </nav>
 
       <!-- “Войти” -->
-      <NuxtLink to="/" class="auth">
-        <div class="icon">
-          <Icon name="stash:signin-light" />
+      <NuxtLink to="/" class="auth flex items-center justify-center gap-2">
+        <div class="icon flex items-center justify-center">
+          <Icon name="stash:signin-light" :size="24" />
         </div>
         <p>Войти</p>
       </NuxtLink>
@@ -84,10 +82,6 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
 </template>
 
 <style scoped>
-#header-menu {
-  display: flex;
-  gap: 1.5rem;
-}
 .menu-item {
   position: relative;
 }
