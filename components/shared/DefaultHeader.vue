@@ -2,6 +2,11 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import Logo from "@/components/Uikit/Visuals/Logo.vue";
 import MenuLink from "@/components/Uikit/menu/MenuLink.vue";
+import { useModalStore } from "~/store/useModalStore";
+import { useAuthStore, useAuthStoreRefs } from "~/store/useAuthStore";
+
+const { openModal } = useModalStore();
+const { user } = useAuthStoreRefs();
 
 const menuList = [
   { menuLink: "/lofts", menuName: "Выбрать зал" },
@@ -42,7 +47,11 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
       <Logo />
 
       <nav id="header-menu" class="flex items-center justify-center gap-6">
-        <div v-for="(item, i) in menuList" :key="'menu-item-' + i" class="menu-item">
+        <div
+          v-for="(item, i) in menuList"
+          :key="'menu-item-' + i"
+          class="menu-item"
+        >
           <MenuLink
             :menuLink="item.menuLink"
             class="menu-link"
@@ -71,12 +80,15 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
       </nav>
 
       <!-- “Войти” -->
-      <NuxtLink to="/" class="auth flex items-center justify-center gap-2">
+      <div
+        class="auth flex items-center justify-center gap-2"
+        @click="openModal('auth')"
+      >
         <div class="icon flex items-center justify-center">
           <Icon name="stash:signin-light" :size="24" />
         </div>
         <p>Войти</p>
-      </NuxtLink>
+      </div>
     </div>
   </header>
 </template>

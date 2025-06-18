@@ -1,6 +1,8 @@
 <template>
   <div @click="handleClick">
-    <button>{{ buttonName }}</button>
+    <button class="bg-orange py-3 px-8 rounded-full text-white w-full">
+      {{ buttonName }}
+    </button>
   </div>
 </template>
 

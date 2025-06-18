@@ -1,10 +1,13 @@
 <template>
   <DefaultHeader />
   <NuxtPage />
-  <AuthModals />
+  <!-- <AuthModals /> -->
   <DefaultFooter />
   <transition name="fade-bg">
     <div v-if="isModalActive" class="page-bg" @click="closeAllModals"></div>
+  </transition>
+  <transition name="fade-bg">
+    <AuthModals v-if="modals.auth === true" />
   </transition>
 </template>
 
@@ -30,7 +33,7 @@ const isModalActive = computed(() => {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 100;
+  z-index: 9;
 }
 
 .fade-bg-enter-active,

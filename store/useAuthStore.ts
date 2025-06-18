@@ -1,6 +1,6 @@
 // /stores/auth.ts
 import { defineStore } from 'pinia'
-import { useSupabaseClient, useSupabaseUser } from '#imports'
+import { useSupabaseClient } from '#imports'
 import type { AuthError, User, Session } from '@supabase/supabase-js'
 
 export const useAuthStore = defineStore('auth', {
@@ -9,10 +9,12 @@ export const useAuthStore = defineStore('auth', {
     session: null as Session | null,
     loading: false,
     error: null as string | null,
-    otpSentTo: '' as string,        // ← куда отправили код
+    otpSentTo: '' as string,
   }),
 
-  getters: { isAuth: s => !!s.user },
+  getters: {
+    isAuth: s => !!s.user,
+  },
 
   actions: {
     async init () {
@@ -27,33 +29,31 @@ export const useAuthStore = defineStore('auth', {
       })
     },
 
-    /** ---------- OTP step 1: отправка кода ---------- */
-    async sendOtp (identifier: string, channel: 'email' | 'sms' = 'email') {
+    /** ---------- Отправка email-кода ---------- */
+    async sendOtp (email: string) {
       this._reset()
       this.loading = true
       const supabase = useSupabaseClient()
 
-      const { error } = await supabase.auth.signInWithOtp(
-        channel === 'email'
-          ? { email: identifier, options: { emailRedirectTo: window.location.origin } }
-          : { phone: identifier }
-      )
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin }
+      })
 
       if (error) return this._fail(error)
-      this.otpSentTo = identifier
+      this.otpSentTo = email
       this.loading = false
     },
 
-    /** ---------- OTP step 2: подтверждение ---------- */
-    async verifyOtp (identifier: string, token: string, channel: 'email' | 'sms' = 'email') {
+    /** ---------- Подтверждение email-кода ---------- */
+    async verifyOtp (email: string, token: string) {
       this._reset()
       this.loading = true
       const supabase = useSupabaseClient()
 
       const { data, error } = await supabase.auth.verifyOtp({
-        type: channel === 'email' ? 'magiclink' : 'sms',
-        email: channel === 'email' ? identifier : undefined,
-        phone: channel === 'sms'   ? identifier : undefined,
+        type: 'email',     // ✅ ВАЖНО: 'email', а не 'magiclink'
+        email,
         token,
       })
 
@@ -63,8 +63,15 @@ export const useAuthStore = defineStore('auth', {
       this.loading = false
     },
 
-    /* helpers */
-    _fail (e: AuthError) { this.error = e.message; this.loading = false },
-    _reset () { this.error = null },
+    _fail (e: AuthError) {
+      this.error = e.message
+      this.loading = false
+    },
+
+    _reset () {
+      this.error = null
+    },
   },
 })
+
+export const useAuthStoreRefs = () => storeToRefs(useAuthStore());
