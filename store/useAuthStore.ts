@@ -1,7 +1,8 @@
-// /stores/auth.ts
+
 import { defineStore } from 'pinia'
 import { useSupabaseClient } from '#imports'
 import type { AuthError, User, Session } from '@supabase/supabase-js'
+import { useModalStore } from './useModalStore'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -45,23 +46,26 @@ export const useAuthStore = defineStore('auth', {
       this.loading = false
     },
 
-    /** ---------- Подтверждение email-кода ---------- */
-    async verifyOtp (email: string, token: string) {
-      this._reset()
-      this.loading = true
-      const supabase = useSupabaseClient()
+async verifyOtp (email: string, token: string) {
+  this._reset()
+  this.loading = true
+  const supabase = useSupabaseClient()
+  const modal = useModalStore()                // 👈 импорт стора модалок
 
-      const { data, error } = await supabase.auth.verifyOtp({
-        type: 'email',     // ✅ ВАЖНО: 'email', а не 'magiclink'
-        email,
-        token,
-      })
+  const { data, error } = await supabase.auth.verifyOtp({
+    type: 'email',
+    email,
+    token,
+  })
 
-      if (error) return this._fail(error)
-      this.session = data.session
-      this.user    = data.user
-      this.loading = false
-    },
+  if (error) return this._fail(error)
+
+  this.session = data.session
+  this.user    = data.user
+  this.loading = false
+
+  modal.closeAllModals()                       // 👈 закрываем всё после успеха
+},
 
     _fail (e: AuthError) {
       this.error = e.message
@@ -71,6 +75,12 @@ export const useAuthStore = defineStore('auth', {
     _reset () {
       this.error = null
     },
+    logout: async function () {
+  const supabase = useSupabaseClient()
+  await supabase.auth.signOut()
+  this.user = null
+  this.session = null
+}
   },
 })
 

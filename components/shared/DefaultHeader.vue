@@ -4,9 +4,11 @@ import Logo from "@/components/Uikit/Visuals/Logo.vue";
 import MenuLink from "@/components/Uikit/menu/MenuLink.vue";
 import { useModalStore } from "~/store/useModalStore";
 import { useAuthStore, useAuthStoreRefs } from "~/store/useAuthStore";
+import ProfileDropdown from "../Uikit/Dropdown/ProfileDropdown.vue";
 
 const { openModal } = useModalStore();
 const { user } = useAuthStoreRefs();
+const toggleProfileDropdown = ref<boolean>(false);
 
 const menuList = [
   { menuLink: "/lofts", menuName: "Выбрать зал" },
@@ -79,15 +81,34 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
         </div>
       </nav>
 
-      <!-- “Войти” -->
-      <div
-        class="auth flex items-center justify-center gap-2"
-        @click="openModal('auth')"
-      >
-        <div class="icon flex items-center justify-center">
-          <Icon name="stash:signin-light" :size="24" />
-        </div>
-        <p>Войти</p>
+      <!-- auth block -->
+      <div class="auth flex items-center justify-center gap-2 relative">
+        <template v-if="!user">
+          <div
+            class="flex items-center gap-2 cursor-pointer"
+            @click="openModal('auth')"
+          >
+            <Icon name="stash:signin-light" :size="24" />
+            <p>Войти</p>
+          </div>
+        </template>
+
+        <template v-else>
+          <div
+            class="flex items-center gap-2 hover:bg-slate-100 px-2 py-1 rounded-md transition-all duration-200 cursor-pointer"
+            @click="toggleProfileDropdown = !toggleProfileDropdown"
+          >
+            <Icon name="arcticons:schoolboy-runaway" :size="40" />
+            <div class="flex flex-col">
+              <span class="text-14">Гость</span>
+              <span class="text-12 opacity-50">Клиент</span>
+            </div>
+          </div>
+        </template>
+        <ProfileDropdown
+          class="absolute top-[100%] left-0"
+          v-if="toggleProfileDropdown"
+        />
       </div>
     </div>
   </header>

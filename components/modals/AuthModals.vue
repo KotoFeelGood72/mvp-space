@@ -11,10 +11,11 @@
       >
         <Icon name="material-symbols:close" />
       </div>
-      <div v-if="step === 1" class="">
+
+      <div v-if="step === 1">
         <div class="flex flex-col gap-2 mb-6">
           <h3 class="text-xl font-semibold">Вход</h3>
-          <p>Введите телефон или email для того, чтобы войти</p>
+          <p>Введите email для того, чтобы войти</p>
         </div>
 
         <DefaultInput
@@ -23,9 +24,7 @@
           placeholder="you@example.com"
           class="mb-6"
         />
-        <Buttons
-          :buttonName="auth.loading ? 'Отправляем…' : 'Отправить код'"
-        ></Buttons>
+        <Buttons :buttonName="auth.loading ? 'Отправляем…' : 'Отправить код'" />
       </div>
 
       <!-- Шаг 2 -->
@@ -43,12 +42,18 @@
           required
         />
 
-        <button :disabled="auth.loading" class="btn-primary w-full">
-          {{ auth.loading ? "Проверяем…" : "Войти" }}
-        </button>
+        <Buttons :buttonName="auth.loading ? 'Проверяем…' : 'Войти'" />
 
-        <button type="button" @click="reset" class="link text-sm">
-          Отправить заново
+        <button
+          type="button"
+          class="link text-sm"
+          @click="reset"
+          :disabled="timer > 0"
+        >
+          <template v-if="timer > 0">
+            Можно отправить повторно через {{ timer }} сек.
+          </template>
+          <template v-else> Отправить заново </template>
         </button>
       </div>
 
@@ -58,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onBeforeUnmount } from "vue";
 import DefaultInput from "../Uikit/inputs/DefaultInput.vue";
 import { useAuthStore } from "~/store/useAuthStore";
 import Buttons from "../Uikit/Buttons/Buttons.vue";
@@ -67,20 +72,39 @@ const auth = useAuthStore();
 const step = ref(1);
 const identifier = ref("");
 const token = ref("");
-const channel = ref<"email" | "sms">("email");
+const timer = ref(0);
+let interval: ReturnType<typeof setInterval> | null = null;
 
-watch(
-  () => auth.otpSentTo,
-  (val) => {
-    if (val) step.value = 2;
-  }
-);
-
-const send = () => auth.sendOtp(identifier.value.trim());
-const confirm = () => auth.verifyOtp(identifier.value.trim(), token.value);
-const reset = () => {
-  step.value = 1;
-  auth.otpSentTo = "";
-  token.value = "";
+const startTimer = (seconds = 60) => {
+  timer.value = seconds;
+  if (interval) clearInterval(interval);
+  interval = setInterval(() => {
+    timer.value--;
+    if (timer.value <= 0 && interval) {
+      clearInterval(interval);
+      interval = null;
+    }
+  }, 1000);
 };
+
+const send = async () => {
+  await auth.sendOtp(identifier.value.trim());
+  if (!auth.error) {
+    step.value = 2;
+    startTimer();
+  }
+};
+
+const confirm = async () => {
+  await auth.verifyOtp(identifier.value.trim(), token.value);
+};
+
+const reset = async () => {
+  token.value = "";
+  await send();
+};
+
+onBeforeUnmount(() => {
+  if (interval) clearInterval(interval);
+});
 </script>
