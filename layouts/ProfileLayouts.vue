@@ -1,18 +1,23 @@
 <template>
-  <div class="container">
-    <div>
-      <ProfileSidebars :page-name="pageName" />
-    </div>
-    <div>
-      <slot />
+  <div>
+    <PageHeadDefault :title="title" :text="text" />
+    <div class="container flex gap-24">
+      <div>
+        <ProfileSidebars />
+      </div>
+      <div>
+        <slot />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import ProfileSidebars from "~/components/shared/ProfileSidebars.vue";
+import PageHeadDefault from "~/components/PageHead/PageHeadDefault.vue";
 const props = defineProps<{
-  pageName: string;
+  title: string;
+  text: string;
 }>();
 </script>
 

@@ -1,24 +1,14 @@
 <template>
   <div
-    class="bg-gray-50 rounded-3xl p-6 w-64 min-h-[400px] flex flex-col justify-between"
+    class="bg-light rounded-3xl p-6 w-64 min-h-[400px] flex flex-col justify-between py-7 px-9"
   >
-    <!-- Меню -->
     <ul class="space-y-4 text-gray-700 text-[16px] font-medium">
-      <li
-        v-for="item in menuItems"
-        :key="item.label"
-        :class="{
-          'text-gray-900 font-bold': item.label === pageName,
-          'hover:text-black transition': item.label !== pageName,
-        }"
-      >
+      <li v-for="item in menuItems" :key="item.label">
         <NuxtLink :to="item.link">
           {{ item.label }}
         </NuxtLink>
       </li>
     </ul>
-
-    <!-- Кнопка выхода -->
     <button
       @click="logout"
       class="mt-10 flex items-center text-gray-400 hover:text-gray-600 transition text-sm"
@@ -33,10 +23,6 @@
 import { useAuthStore } from "~/store/useAuthStore";
 
 const auth = useAuthStore();
-
-defineProps<{
-  pageName: string;
-}>();
 
 const menuItems = [
   { label: "Профиль", link: "/profile" },

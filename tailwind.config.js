@@ -25,17 +25,10 @@ module.exports = {
         },
       },
       colors: {
-        primary: '#1E40AF',
-        secondary: '#F59E0B',
-        accent: '#10B981',
-        light: '#F0F0F0',
-        lightXs: '#F2F2F2',
-        lightFt: '#B2B2B2',
-        dark: '#222222',
-        gray: '#DBDBDB',
-        orange: '#FF9447',
-        borderGray: '#D8D8D8',
-        lightOrange: '#FFDABF'
+        light: '#f5f6fa99',
+        lightText: '#b4bbc6',
+        darkText: '#3b4453',
+        orange: '#ff7739'
       },
       fontSize: {
         huge: ['4rem', '1.2'],
