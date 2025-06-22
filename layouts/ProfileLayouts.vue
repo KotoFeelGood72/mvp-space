@@ -9,7 +9,9 @@
         <slot />
       </div>
     </div>
-    <CreateSpaceModals />
+    <transition name="fade-bg">
+      <CreateSpaceModals v-if="modals.createSpace === true" />
+    </transition>
   </div>
 </template>
 
@@ -17,6 +19,15 @@
 import ProfileSidebars from "~/components/shared/ProfileSidebars.vue";
 import PageHeadDefault from "~/components/PageHead/PageHeadDefault.vue";
 import CreateSpaceModals from "~/components/modals/CreateSpaceModals.vue";
+
+import { useModalStore, useModalStoreRefs } from "~/store/useModalStore";
+
+const { modals } = useModalStoreRefs();
+const { closeAllModals } = useModalStore();
+
+const isModalActive = computed(() => {
+  return Object.values(modals.value).some((isActive) => isActive);
+});
 const props = defineProps<{
   title: string;
   text: string;
