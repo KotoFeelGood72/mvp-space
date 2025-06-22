@@ -1,12 +1,13 @@
 import { defineStore, storeToRefs } from "pinia";
 
-type ModalName = "auth" | "payment"; 
+type ModalName = "auth" | "payment" | 'createSpace'; 
 
 export const useModalStore = defineStore("modal", {
   state: (): { modals: Record<ModalName, boolean> } => ({
     modals: {
       auth: false,
       payment: false,
+      createSpace: false,
     },
   }),
 

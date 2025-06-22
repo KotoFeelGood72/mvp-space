@@ -26,7 +26,7 @@ const menuList = [
       { menuLink: "/contacts", menuName: "Контакты" },
     ],
   },
-  { menuLink: "/add-places", menuName: "Добавить площадку" },
+  // { menuLink: "/add-places", menuName: "Добавить площадку" },
 ];
 
 const open = ref<number | null>(null);
@@ -98,7 +98,7 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
             class="flex items-center gap-2 hover:bg-slate-100 px-2 py-1 rounded-md transition-all duration-200 cursor-pointer"
             @click="toggleProfileDropdown = !toggleProfileDropdown"
           >
-            <Icon name="arcticons:schoolboy-runaway" :size="40" />
+            <img src="@/assets/img/profile.svg" alt="" />
             <div class="flex flex-col">
               <span class="text-14">Гость</span>
               <span class="text-12 opacity-50">Клиент</span>

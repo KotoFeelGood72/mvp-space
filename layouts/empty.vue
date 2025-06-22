@@ -1,22 +1,12 @@
 <template>
-  <div class="default-layout">
-    <DefaultHeader />
-    <NuxtPage />
-    <!-- <AuthModals /> -->
-    <DefaultFooter />
-    <transition name="fade-bg">
-      <div v-if="isModalActive" class="page-bg" @click="closeAllModals"></div>
-    </transition>
-    <transition name="fade-bg">
-      <AuthModals v-if="modals.auth === true" />
-    </transition>
-  </div>
+  <NuxtPage />
+  <DefaultFooter />
+  <transition name="fade-bg">
+    <div v-if="isModalActive" class="page-bg" @click="closeAllModals"></div>
+  </transition>
 </template>
 
 <script setup lang="ts">
-import DefaultHeader from "~/components/shared/Header.vue";
-import DefaultFooter from "~/components/shared/Footer.vue";
-import AuthModals from "~/components/modals/AuthModals.vue";
 import { useModalStore, useModalStoreRefs } from "~/store/useModalStore";
 
 const { modals } = useModalStoreRefs();
@@ -51,9 +41,5 @@ const isModalActive = computed(() => {
 .fade-bg-enter-to,
 .fade-bg-leave-from {
   opacity: 1;
-}
-
-.default-layout {
-  background: linear-gradient(235deg, #f7f8fb, #fff);
 }
 </style>
