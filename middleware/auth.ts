@@ -8,6 +8,6 @@ export default defineNuxtRouteMiddleware((to) => {
 console.log(isFullyAuthed)
 
   if (!isFullyAuthed && to.path !== '/login') {
-    return navigateTo('/login')
+    return navigateTo('/')
   }
 })
