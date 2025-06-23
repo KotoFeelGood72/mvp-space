@@ -91,9 +91,9 @@ async function onCreatePlace() {
       price: price.value,
       address: address.value,
       short: short.value,
-    },
-    selectedTypes.value,
-    images.value
+    }
+    // selectedTypes.value,
+    // images.value
   );
 }
 
