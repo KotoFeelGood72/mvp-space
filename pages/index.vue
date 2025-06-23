@@ -26,12 +26,17 @@
         </ul>
       </div>
     </section>
+    <section class="newplace">
+      <!-- <SlidersPlace /> -->
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import DefaultForm from "~/components/Uikit/forms/DefaultForm.vue";
 import ServicesCard from "~/components/Uikit/cards/ServicesCard.vue";
+import SlidersPlace from "~/components/sliders/SlidersPlace.vue";
+
 // definePageMeta({ middleware: "auth" });
 const ServicesList = ref<any>([
   {
