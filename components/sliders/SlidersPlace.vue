@@ -3,7 +3,7 @@
     <div class="container">
       <div>
         <div>
-          <h3>{{ section.title }}</h3>
+          <h3>{{ title }}</h3>
         </div>
         <div>
           <div class="prev" :class="'arrow-prev' + section.name"></div>
@@ -37,6 +37,7 @@ import "swiper/css/navigation";
 const props = defineProps<{
   places: any;
   section: any;
+  title: string;
 }>();
 </script>
 

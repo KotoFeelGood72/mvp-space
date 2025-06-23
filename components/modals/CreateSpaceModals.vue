@@ -13,6 +13,12 @@
     <div class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
         <!-- <Selects :options="placeTypes" v-model="cities" /> -->
+        <Inputs v-model="price" placeholder="Название пространства" />
+        <Inputs v-model="address" placeholder="Адрес" />
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <!-- <Selects :options="placeTypes" v-model="cities" /> -->
+        <Inputs v-model="price" placeholder="Название пространства" />
         <Inputs v-model="address" placeholder="Адрес" />
       </div>
 
