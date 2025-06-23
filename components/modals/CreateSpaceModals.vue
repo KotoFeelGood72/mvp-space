@@ -12,28 +12,17 @@
 
     <div class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
-        <Selects
-          :options="[
-            { label: 'Москва', value: 'space1' },
-            { label: 'Краснодар', value: 'space2' },
-            { label: 'Ставрополь', value: 'space3' },
-          ]"
-          v-model="selectedSpace"
-        />
-        <Inputs v-model="spaceName" placeholder="Адрес" />
+        <Selects :options="placeTypes" v-model="cities" />
+        <Inputs v-model="address" placeholder="Адрес" />
       </div>
+
+      <!-- Множественный выбор типов -->
       <div>
-        <Selects
-          :options="[
-            { label: 'Площадка 1', value: 'space1' },
-            { label: 'Площадка 2', value: 'space2' },
-            { label: 'Площадка 3', value: 'space3' },
-          ]"
-          v-model="anotherSelection"
-        />
+        <Selects :options="placeTypesList" v-model="selectedTypes" multiple />
       </div>
+
       <div class="grid grid-cols-2 gap-4">
-        <Inputs v-model="anotherInput" placeholder="Начальная стоимость" />
+        <Inputs v-model="price" placeholder="Начальная стоимость" />
 
         <Selects
           :options="[
@@ -42,7 +31,7 @@
             { label: 'Депозит на человека', value: 'space3' },
             { label: 'Сеанс', value: 'space3' },
           ]"
-          v-model="thirdSelection"
+          v-model="format_payment"
         />
       </div>
 
@@ -51,29 +40,67 @@
       </div>
 
       <div>
-        <Textarea v-model="description" />
+        <Textarea v-model="short" />
       </div>
 
-      <Buttons button-name="Разместить площадку" />
+      <Buttons button-name="Разместить площадку" @click="onCreatePlace" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Selects from "../selects/Selects.vue";
 import Inputs from "../inputs/Inputs.vue";
 import ImageUploader from "@/components/file/ImageUploader.vue";
 import Textarea from "../inputs/Textarea.vue";
 import Buttons from "../Uikit/Buttons/Buttons.vue";
+import { usePlacesStore, usePlacesStoreRefs } from "~/store/usePlacesStore";
 
-const selectedSpace = ref("space1");
-const description = ref("space1");
-const spaceName = ref("");
-const anotherSelection = ref("");
-const anotherInput = ref("");
-const thirdSelection = ref("");
-const images = ref<string[]>([]);
+// Поля формы
+const cities = ref(["Москва"]);
+const title = ref("");
+const format_payment = ref("");
+const price = ref("");
+const address = ref("");
+const short = ref("");
+const images = ref([]); // массив строк (URL или base64)
+
+// Множественный выбор типов
+const selectedTypes = ref([]); // массив ID типов
+
+// Доступ к стору
+const { createPlace, selectTypePlaces } = usePlacesStore();
+const { placeTypes } = usePlacesStoreRefs();
+
+// Маппинг типов в формат Select
+const placeTypesList = computed(() => {
+  return placeTypes?.value.map((type: any) => ({
+    label: type.title,
+    value: type.id,
+  }));
+});
+
+// Обработка создания
+async function onCreatePlace() {
+  await createPlace(
+    {
+      cities: cities.value,
+      title: title.value,
+      format_payment: format_payment.value,
+      price: price.value,
+      address: address.value,
+      short: short.value,
+    },
+    selectedTypes.value,
+    images.value
+  );
+}
+
+// Получение типов при загрузке
+onMounted(() => {
+  selectTypePlaces();
+});
 </script>
 
 <style scoped></style>

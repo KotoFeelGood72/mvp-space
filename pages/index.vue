@@ -35,6 +35,9 @@
 <script setup lang="ts">
 import DefaultForm from "~/components/Uikit/forms/DefaultForm.vue";
 import ServicesCard from "~/components/Uikit/cards/ServicesCard.vue";
+import { usePlacesStore } from "~/store/usePlacesStore";
+
+const { selectPlaces } = usePlacesStore();
 import SlidersPlace from "~/components/sliders/SlidersPlace.vue";
 
 // definePageMeta({ middleware: "auth" });
@@ -63,6 +66,10 @@ const ServicesList = ref<any>([
     img: "/assets/img/services/manager.webp",
   },
 ]);
+
+onMounted(() => {
+  selectPlaces();
+});
 </script>
 
 <style scoped></style>
