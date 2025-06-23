@@ -5,20 +5,20 @@
     <div class="text-center flex flex-col gap-3 max-w-md mb-10">
       <h3 class="text-30 text-darkText font-bold">К размещению</h3>
       <p>
-        Для того чтобы разместиться, заполните простую форму, а все остальное мы
-        уточним в процессе
+        Для того чтобы разместиться, заполните простую форму, а все остальное мы уточним в
+        процессе
       </p>
     </div>
 
     <div class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
-        <Selects :options="placeTypes" v-model="cities" />
+        <!-- <Selects :options="placeTypes" v-model="cities" /> -->
         <Inputs v-model="address" placeholder="Адрес" />
       </div>
 
       <!-- Множественный выбор типов -->
       <div>
-        <Selects :options="placeTypesList" v-model="selectedTypes" multiple />
+        <Selects :options="placeTypesList" v-model="selectedType" />
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -58,46 +58,55 @@ import Buttons from "../Uikit/Buttons/Buttons.vue";
 import { usePlacesStore, usePlacesStoreRefs } from "~/store/usePlacesStore";
 
 // Поля формы
-const cities = ref(["Москва"]);
-const title = ref("");
+const cities = ref("Москва");
+const title = ref(""); // было забыто!
 const format_payment = ref("");
 const price = ref("");
 const address = ref("");
 const short = ref("");
-const images = ref([]); // массив строк (URL или base64)
+const images = ref<string[]>([]); // изображения: base64 или ссылки
 
-// Множественный выбор типов
-const selectedTypes = ref([]); // массив ID типов
+// Выбор типа (одиночный выбор для now)
+const selectedType = ref(null); // если нужен множественный выбор — делаем selectedTypes = ref([])
 
-// Доступ к стору
+// Store
 const { createPlace, selectTypePlaces } = usePlacesStore();
 const { placeTypes } = usePlacesStoreRefs();
 
-// Маппинг типов в формат Select
 const placeTypesList = computed(() => {
-  return placeTypes?.value.map((type: any) => ({
+  if (!placeTypes.value) return [];
+  return placeTypes.value.map((type: any) => ({
     label: type.title,
     value: type.id,
   }));
 });
 
-// Обработка создания
+// Создание площадки
 async function onCreatePlace() {
-  await createPlace(
-    {
-      cities: cities.value,
-      title: title.value,
-      format_payment: format_payment.value,
-      price: price.value,
-      address: address.value,
-      short: short.value,
-    }
-    // selectedTypes.value,
-    // images.value
-  );
+  if (!selectedType.value) {
+    return alert("Выберите тип площадки");
+  }
+
+  const payload = {
+    title: title.value,
+    // city: cities.value,
+    address: address.value,
+    short: short.value,
+    price: Number(price.value),
+    format_payment: format_payment.value,
+    place_type_id: selectedType.value,
+  };
+
+  try {
+    const placeId = await createPlace(payload, images.value);
+    alert("Площадка создана, ID: " + placeId);
+  } catch (e) {
+    console.error("Ошибка при создании:", e);
+    alert("Ошибка при создании площадки");
+  }
 }
 
-// Получение типов при загрузке
+// При монтировании
 onMounted(() => {
   selectTypePlaces();
 });
