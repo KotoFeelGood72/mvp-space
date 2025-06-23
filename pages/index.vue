@@ -27,7 +27,7 @@
       </div>
     </section>
     <section class="newplace">
-      <!-- <SlidersPlace /> -->
+      <SlidersPlace :places="places" title="Популярное" section="popular" />
     </section>
   </div>
 </template>
@@ -35,9 +35,10 @@
 <script setup lang="ts">
 import DefaultForm from "~/components/Uikit/forms/DefaultForm.vue";
 import ServicesCard from "~/components/Uikit/cards/ServicesCard.vue";
-import { usePlacesStore } from "~/store/usePlacesStore";
+import { usePlacesStore, usePlacesStoreRefs } from "~/store/usePlacesStore";
 
 const { selectPlaces } = usePlacesStore();
+const { places } = usePlacesStoreRefs();
 import SlidersPlace from "~/components/sliders/SlidersPlace.vue";
 
 // definePageMeta({ middleware: "auth" });
@@ -49,8 +50,7 @@ const ServicesList = ref<any>([
   },
   {
     name: "Только свободные даты",
-    description:
-      "Мы ежедневно проверяем календари площадок, отмечая занятое время",
+    description: "Мы ежедневно проверяем календари площадок, отмечая занятое время",
     img: "/assets/img/services/calendar.webp",
   },
   {
@@ -61,8 +61,7 @@ const ServicesList = ref<any>([
   },
   {
     name: "Прямой контакт с менеджером",
-    description:
-      "Мы отправим вам номер телефона менеджера сразу после оставления заявки",
+    description: "Мы отправим вам номер телефона менеджера сразу после оставления заявки",
     img: "/assets/img/services/manager.webp",
   },
 ]);

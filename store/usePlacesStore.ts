@@ -11,15 +11,15 @@ export const usePlacesStore = defineStore("places", {
     // Загрузка всех площадок
     async selectPlaces() {
       const supabase = useSupabaseClient();
-      try {
-        const { data: places, error } = await supabase
-          .from("places")
-          .select("*"); // можешь добавить JOIN или фильтр
-        if (error) throw error;
-        this.places = places;
-      } catch (error) {
-        console.error("Ошибка при загрузке places:", error);
-      }
+
+      const { data, error } = await supabase.from("places").select(`
+        *, 
+        places_types(*),
+        places_gallery(id, img)
+      `);
+
+      if (error) throw error;
+      this.places = data;
     },
 
     // Загрузка типов площадок
