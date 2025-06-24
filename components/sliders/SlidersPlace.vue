@@ -1,9 +1,9 @@
 <template>
   <div class="">
     <div class="container">
-      <div>
+      <div class="flex items-center justify-between mb-10">
         <div>
-          <h3>{{ title }}</h3>
+          <h3 class="text-24 text-darkText font-bold">{{ title }}</h3>
         </div>
         <div>
           <div class="prev" :class="'arrow-prev' + section.name"></div>

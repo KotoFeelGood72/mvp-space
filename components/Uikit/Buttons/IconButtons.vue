@@ -5,10 +5,10 @@
     class="icon-btn"
     @click="handleClick"
   >
-    <Icon :name="iconName" />
+    <Icon :name="iconName" :size="iconSize" />
   </NuxtLink>
   <button v-else type="button" class="icon-btn" @click="handleClick">
-    <Icon :name="iconName" />
+    <Icon :name="iconName" :size="iconSize" />
   </button>
 </template>
 
@@ -16,6 +16,7 @@
 const props = defineProps<{
   iconName: string;
   iconLink?: string;
+  iconSize?: number;
 }>();
 
 const emit = defineEmits<{

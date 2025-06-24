@@ -15,7 +15,8 @@ export const usePlacesStore = defineStore("places", {
       const { data, error } = await supabase.from("places").select(`
         *, 
         places_types(*),
-        places_gallery(id, img)
+        places_gallery(id, img),
+        place_params(*)
       `);
 
       if (error) throw error;
