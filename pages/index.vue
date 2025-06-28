@@ -3,8 +3,10 @@
     <section id="hero" class="lg:mb-20">
       <div class="container flex items-center justify-between">
         <div class="max-w-[50%]">
-          <h1 class="lg:text-40 font-bold">
-            Более 2 900 площадок для вашего мероприятия
+          <h1 class="lg:text-40 font-bold mb-10">
+            Более<br />
+            2 900 площадок для<br />
+            вашего мероприятия
           </h1>
 
           <DefaultForm />
@@ -26,8 +28,54 @@
         </ul>
       </div>
     </section>
-    <section class="newplace">
+    <section class="popularlace mb-28">
       <SlidersPlace :places="places" title="Популярное" section="popular" />
+    </section>
+    <section class="newplace mb-28">
+      <SlidersPlace :places="places" title="Новые площадки" section="new" />
+    </section>
+    <section class="newplace mb-28">
+      <CategoryGrid />
+    </section>
+    <section class="popularlace mb-28">
+      <SlidersPlace
+        :places="places"
+        title="Площадки для корпоративов"
+        section="corporate"
+      />
+    </section>
+    <section class="popularlace mb-28">
+      <SlidersPlace
+        :places="places"
+        title="Площадки для Дня рождения"
+        section="happy"
+      />
+    </section>
+    <section class="popularlace mb-28">
+      <SlidersPlace
+        :places="places"
+        title="Площадки для детских праздников"
+        section="happy"
+      />
+    </section>
+    <section class="popularlace mb-28">
+      <SlidersPlace :places="places" title="Фотостудии" section="happy" />
+    </section>
+    <section class="popularlace mb-28">
+      <SlidersPlace :places="places" title="Кафе и рестораны" section="happy" />
+    </section>
+    <section class="popularlace mb-28">
+      <SlidersPlace
+        :places="places"
+        title="Тренинги и мастер-классы"
+        section="happy"
+      />
+    </section>
+    <section class="popularlace mb-28">
+      <StepsGrid />
+    </section>
+    <section class="popularlace mb-28">
+      <FaqsBlock />
     </section>
   </div>
 </template>
@@ -35,11 +83,14 @@
 <script setup lang="ts">
 import DefaultForm from "~/components/Uikit/forms/DefaultForm.vue";
 import ServicesCard from "~/components/Uikit/cards/ServicesCard.vue";
+import SlidersPlace from "~/components/sliders/SlidersPlace.vue";
+import CategoryGrid from "~/components/grid/CategoryGrid.vue";
+import StepsGrid from "~/components/grid/StepsGrid.vue";
+import FaqsBlock from "~/components/blocks/FaqsBlock.vue";
 import { usePlacesStore, usePlacesStoreRefs } from "~/store/usePlacesStore";
 
-const { selectPlaces } = usePlacesStore();
+const { fetchPlaces } = usePlacesStore();
 const { places } = usePlacesStoreRefs();
-import SlidersPlace from "~/components/sliders/SlidersPlace.vue";
 
 // definePageMeta({ middleware: "auth" });
 const ServicesList = ref<any>([
@@ -69,7 +120,7 @@ const ServicesList = ref<any>([
 ]);
 
 onMounted(() => {
-  selectPlaces();
+  fetchPlaces();
 });
 </script>
 

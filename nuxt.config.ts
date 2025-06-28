@@ -7,9 +7,10 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxtjs/tailwindcss",
     "@nuxt/icon",
-    "@nuxtjs/supabase",
   ],
-  supabase: {
-    redirect: false,
-  },
+  runtimeConfig: {
+    public: {
+      SITE_URL: process.env.SITE_URL || 'https://space.gleede.ru/'
+    }
+  }
 });

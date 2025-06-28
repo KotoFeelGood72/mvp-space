@@ -5,24 +5,20 @@
     <div class="text-center flex flex-col gap-3 max-w-md mb-10">
       <h3 class="text-30 text-darkText font-bold">К размещению</h3>
       <p>
-        Для того чтобы разместиться, заполните простую форму, а все остальное мы уточним в
-        процессе
+        Для того чтобы разместиться, заполните простую форму, а все остальное мы
+        уточним в процессе
       </p>
     </div>
 
     <div class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
-        <!-- <Selects :options="placeTypes" v-model="cities" /> -->
         <Inputs v-model="price" placeholder="Название пространства" />
         <Inputs v-model="address" placeholder="Адрес" />
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <!-- <Selects :options="placeTypes" v-model="cities" /> -->
         <Inputs v-model="price" placeholder="Название пространства" />
         <Inputs v-model="address" placeholder="Адрес" />
       </div>
-
-      <!-- Множественный выбор типов -->
       <div>
         <Selects :options="placeTypesList" v-model="selectedType" />
       </div>

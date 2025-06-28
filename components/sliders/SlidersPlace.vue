@@ -11,8 +11,9 @@
         </div>
       </div>
       <Swiper
+        class="!px-3 !py-3 !-mx-3 !-my-3"
         :modules="[Navigation]"
-        :slides-per-view="3.5"
+        :slides-per-view="3.1"
         :space-between="12"
         :navigation="{
           prevEl: '.arrow-prev' + section.name,

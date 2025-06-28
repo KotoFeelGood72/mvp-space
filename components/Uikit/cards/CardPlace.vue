@@ -1,6 +1,6 @@
 <template>
   <div
-    class="CardPlace rounded-2xl bg-white overflow-hidden shadow-md"
+    class="CardPlace rounded-2xl bg-white overflow-hidden shadow-main font-plex"
     v-if="card"
   >
     <div class="relative h-60 group">
@@ -20,11 +20,11 @@
         }"
       >
         <swiper-slide
-          v-for="(img, index) in card.places_gallery"
+          v-for="(img, index) in card.acf.space.gallery"
           :key="index"
           class="h-full"
         >
-          <img :src="img.img" alt="" class="w-full h-full object-cover" />
+          <img :src="img.url" alt="" class="w-full h-full object-cover" />
         </swiper-slide>
       </Swiper>
 
@@ -48,8 +48,8 @@
 
     <div class="px-6 pb-8 pt-6">
       <div class="grid grid-cols-2 gap-2 mb-5">
-        <div>{{ card.street }}</div>
-        <ul class="flex items-center justify-start gap-2">
+        <div>{{ card.acf.space.short_address }}</div>
+        <ul class="flex items-center justify-end gap-2">
           <li class="flex items-center justify-start gap-1">
             <div class="icon"><Icon name="noto:star" /></div>
             <p>5.0</p>
@@ -59,21 +59,34 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <p class="text-14 text-gray-500">{{ card?.places_types?.title }}</p>
+        <p
+          class="text-14 text-gray-500"
+          v-for="item in card.categories.slice(0, 1)"
+          :key="item.id"
+        >
+          {{ item.name }}
+        </p>
         <h3 class="text-18 font-bold text-darkText">{{ card.title }}</h3>
       </div>
 
-      <div>
-        <ul>
-          <!-- <li v-for="(item, i) in card.characters" :key="i">
-            <span>{{ item.label }}</span>
-            <div>
-              <div class="icon"><Icon :name="item.icon" /></div>
-              <p>{{ item.param }}</p>
+      <div class="border-t border-[##eee] mt-6 pt-6">
+        <ul class="grid grid-cols-3 gap-4 mb-6">
+          <li
+            v-for="(item, i) in card.acf.space.short_params.slice(0, 3)"
+            :key="i"
+          >
+            <span class="text-lightText text-[13px] block mb-1">{{
+              item.icon.label
+            }}</span>
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 flex items-center justify-center">
+                <img :src="`/assets/icons/${item.icon.value}.svg`" alt="" />
+              </div>
+              <p class="text-14">{{ item.value }}</p>
             </div>
-          </li> -->
+          </li>
         </ul>
-        <div>{{ card.price }}</div>
+        <div class="text-18 text-darkText font-bold">{{ priceRange }}</div>
       </div>
     </div>
   </div>
@@ -85,9 +98,24 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-defineProps<{
+const props = defineProps<{
   card: any;
 }>();
+
+const priceRange = computed(() => {
+  const group = props.card?.acf?.space.price_group;
+
+  if (!group) return "";
+
+  const nums = Object.values(group)
+    .map((n) => Number(n))
+    .filter((n) => !Number.isNaN(n))
+    .sort((a, b) => a - b);
+
+  if (!nums.length) return "";
+  const fmt = new Intl.NumberFormat("ru-RU");
+  return `от ${fmt.format(nums[0])} до ${fmt.format(nums.at(-1)!)} ₽ / час`;
+});
 </script>
 
 <style scoped>

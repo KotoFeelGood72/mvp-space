@@ -83,7 +83,7 @@ onUnmounted(() => window.removeEventListener("click", handleOutside));
 
       <!-- auth block -->
       <div class="auth flex items-center justify-center gap-2 relative">
-        <template v-if="!user || user?.is_anonymous === true">
+        <template v-if="!user">
           <div
             class="flex items-center gap-2 cursor-pointer"
             @click="openModal('auth')"

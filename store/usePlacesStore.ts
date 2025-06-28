@@ -1,89 +1,109 @@
-import { defineStore, storeToRefs } from "pinia";
-import { useSupabaseClient } from "#imports";
+/* ~/store/usePlacesStore.ts
+ * Pinia-стор для работы с REST-эндпоинтами “/space/v1/places”
+ * (см. place.php, где зарегистрированы CRUD-роуты).
+ */
 
-export const usePlacesStore = defineStore("places", {
+import { defineStore, storeToRefs } from 'pinia'
+
+interface Place {
+  id: number
+  title: string
+  content: string
+  acf?: Record<string, any>
+  [k: string]: any
+}
+
+export const usePlacesStore = defineStore('places', {
   state: () => ({
-    places: null as any,
-    placeTypes: null as any,
+    places:      []   as Place[],
+    placeTypes:  null as any,   // при необходимости – отдельный эндпоинт
+    categories:  null as any,
+    loading:     false,
+    error:       null as string | null,
   }),
 
   actions: {
-    // Загрузка всех площадок
-    async selectPlaces() {
-      const supabase = useSupabaseClient();
-
-      const { data, error } = await supabase.from("places").select(`
-        *, 
-        places_types(*),
-        places_gallery(id, img),
-        place_params(*)
-      `);
-
-      if (error) throw error;
-      this.places = data;
+    /* ----------------------- helpers ----------------------- */
+    _fail (e: any) {
+      // перехватываем Axios / fetch ошибки
+      this.error   = e?.response?.data?.message || e?.message || 'Ошибка'
+      this.loading = false
+      throw e
     },
 
-    // Загрузка типов площадок
-    async selectTypePlaces() {
-      const supabase = useSupabaseClient();
+    /* ----------------------- GET all ----------------------- */
+    async fetchPlaces (page = 1, perPage = 20) {
+      this.loading = true
+      const { $placesApi } = useNuxtApp()
+
       try {
-        const { data: places_types, error } = await supabase
-          .from("places_types")
-          .select("*");
-        if (error) throw error;
-        this.placeTypes = places_types;
-      } catch (error) {
-        console.error("Ошибка при загрузке типов:", error);
-      }
+        const { data } = await $placesApi.get('/places?acf=space.gallery,space.short_address,space.short_params, space.price_group', {
+          params: { page, per_page: perPage },
+        })
+        this.places = data.items
+      } catch (e) { this._fail(e) }
+      finally     { this.loading = false }
     },
 
-    // Создание площадки + загрузка изображений
-    async createPlace(placeData: any, images: string[]) {
-      const supabase = useSupabaseClient();
-      try {
-        // 1. Сохраняем площадку
-        const { data, error } = await supabase
-          .from("places")
-          .insert([placeData])
-          .select("id"); // получим ID площадки
-        if (error) throw error;
-
-        const placeId = data[0].id;
-
-        // 2. Загружаем изображения (если есть)
-        if (images && images.length > 0) {
-          await this.uploadGallery(placeId, images);
-        }
-
-        // 3. Обновим список
-        await this.selectPlaces();
-
-        return placeId;
-      } catch (error) {
-        console.error("Ошибка при создании площадки:", error);
-        throw error;
-      }
+    /* ----------------------- GET one ----------------------- */
+    async fetchPlace (id: number) {
+      const { $placesApi } = useNuxtApp()
+      const { data } = await $placesApi.get(`/places/${id}`)
+      return data as Place
     },
 
-    // Добавление изображений в places_gallery
-    async uploadGallery(placeId: number, images: string[]) {
-      const supabase = useSupabaseClient();
-      try {
-        const galleryData = images.map((img) => ({
-          place_id: placeId,
-          img,
-        }));
+    /* ----------------------- CREATE ------------------------ */
+    async createPlace (payload: {
+      title: string
+      content?: string
+      acf?: Record<string, any>
+    }) {
+      const { $placesApi } = useNuxtApp()
+      const { data } = await $placesApi.post('/places', payload)
+      // обновляем список локально
+      this.places.unshift(data)
+      return data.id as number
+    },
 
-        const { error } = await supabase
-          .from("places_gallery")
-          .insert(galleryData);
+    /* ----------------------- UPDATE ------------------------ */
+    async updatePlace (id: number, payload: Partial<Place>) {
+      const { $placesApi } = useNuxtApp()
+      const { data } = await $placesApi.put(`/places/${id}`, payload)
+      // заменяем элемент в state
+      const idx = this.places.findIndex(p => p.id === id)
+      if (idx !== -1) this.places[idx] = data
+      return data as Place
+    },
 
-        if (error) throw error;
-      } catch (error) {
-        console.error("Ошибка при загрузке изображений:", error);
-      }
+    /* ----------------------- DELETE ------------------------ */
+    async deletePlace (id: number) {
+      const { $placesApi } = useNuxtApp()
+      await $placesApi.delete(`/places/${id}`)
+      this.places = this.places.filter(p => p.id !== id)
+    },
+
+    /* -------------------- (optionally) gallery upload ------ */
+    /**
+     * API place.php поддерживает обновление ACF-поля
+     * так что можно сохранить массив ссылок в acf.gallery
+     */
+    async uploadGallery (id: number, urls: string[]) {
+      return this.updatePlace(id, { acf: { gallery: urls } })
+    },
+
+    /* -------------------- categories / types --------------- */
+    // примеры-заглушки: настроить при появлении соответствующих эндпоинтов
+    async fetchCategories () {
+      const { $placesApi } = useNuxtApp()
+      const { data } = await $placesApi.get('/categories')
+      this.categories = data
+    },
+    async fetchPlaceTypes () {
+      const { $placesApi } = useNuxtApp()
+      const { data } = await $placesApi.get('/place-types')
+      this.placeTypes = data
     },
   },
-});
+})
 
-export const usePlacesStoreRefs = () => storeToRefs(usePlacesStore());
+export const usePlacesStoreRefs = () => storeToRefs(usePlacesStore())

@@ -1,87 +1,115 @@
-
-import { defineStore } from 'pinia'
-import { useSupabaseClient } from '#imports'
-import type { AuthError, User, Session } from '@supabase/supabase-js'
+import { defineStore, storeToRefs } from 'pinia'
 import { useModalStore } from './useModalStore'
+
+export interface WPUser {
+  ID: number
+  email: string
+  username: string
+  roles: string[]
+  acf?: Record<string, any>      // все кастом-поля ACF
+}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as User | null,
-    session: null as Session | null,
+    user:   null  as WPUser | null,
+    access: null  as string | null,
     loading: false,
-    error: null as string | null,
+    error:   null as string | null,
     otpSentTo: '' as string,
   }),
 
   getters: {
-    isAuth: s => !!s.user,
+    isAuth: s => !!s.access,
   },
 
   actions: {
-    async init () {
-      const supabase = useSupabaseClient()
-      const { data } = await supabase.auth.getSession()
-      this.session = data.session ?? null
-      this.user    = data.session?.user ?? null
-
-      supabase.auth.onAuthStateChange((_e, s) => {
-        this.session = s
-        this.user    = s?.user ?? null
-      })
+    /* ---------------- init ---------------- */
+    init () {
+      if (process.client) {
+        const token = localStorage.getItem('access')
+        if (token) {
+          this.access = token
+          const { $api } = useNuxtApp()
+          $api.defaults.headers.Authorization = `Bearer ${token}`
+        }
+        this.fetchUser() 
+      }
     },
 
-    /** ---------- Отправка email-кода ---------- */
+    /* -------------- send OTP -------------- */
     async sendOtp (email: string) {
-      this._reset()
+      this._reset(); this.loading = true
+      const { $api } = useNuxtApp()
+      try {
+        await $api.post('/send-otp/', { email })
+        this.otpSentTo = email
+      } catch (e) { return this._fail(e) }
+      finally     { this.loading = false }
+    },
+
+    /* -------------- verify OTP ------------ */
+    async verifyOtp (email: string, token: string) {
+      this._reset(); this.loading = true
+      const { $api } = useNuxtApp()
+      const modal    = useModalStore()
+
+      try {
+        const { data } = await $api.post('/verify-otp/', { email, otp_code: token })
+        this.access = data.access_token
+        this.user   = data.user
+
+        if (process.client) localStorage.setItem('access', this.access!)
+        $api.defaults.headers.Authorization = `Bearer ${this.access}`
+
+        modal.closeAllModals()
+      } catch (e) { return this._fail(e) }
+      finally     { this.loading = false }
+    },
+
+    /* -------- fetch current profile ------- */
+    async fetchUser () {
+      const { $api } = useNuxtApp()
       this.loading = true
-      const supabase = useSupabaseClient()
+      try {
+        const { data } = await $api.get('/me/')
+        this.user = data                              // весь объект с ACF
+        return data
+      } catch (e:any) {
+        // если даже после auto-refresh 401 → выходим из аккаунта
+        if (e?.response?.status === 401) await this.logout()
+        return this._fail(e)
+      } finally {
+        this.loading = false
+      }
+    },
 
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin }
-      })
+    /* -------------- manual refresh -------- */
+    async refresh () {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.post('/refresh-token/')
+      this.access = data.access_token
+      if (process.client) localStorage.setItem('access', this.access!)
+      $api.defaults.headers.Authorization = `Bearer ${this.access}`
+      return this.access
+    },
 
-      if (error) return this._fail(error)
-      this.otpSentTo = email
+    /* ---------------- logout -------------- */
+    async logout () {
+      const { $api } = useNuxtApp()
+      await $api.post('/logout/').catch(() => null)
+      if (process.client) localStorage.removeItem('access')
+      this.user = null
+      this.access = null
+      delete $api.defaults.headers.Authorization
+    },
+
+    /* --------------- helpers -------------- */
+    _fail (e:any) {
+      this.error   = e?.response?.data?.message || e?.message || 'Ошибка'
       this.loading = false
     },
-
-async verifyOtp (email: string, token: string) {
-  this._reset()
-  this.loading = true
-  const supabase = useSupabaseClient()
-  const modal = useModalStore()                // 👈 импорт стора модалок
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    type: 'email',
-    email,
-    token,
-  })
-
-  if (error) return this._fail(error)
-
-  this.session = data.session
-  this.user    = data.user
-  this.loading = false
-
-  modal.closeAllModals()                       // 👈 закрываем всё после успеха
-},
-
-    _fail (e: AuthError) {
-      this.error = e.message
-      this.loading = false
-    },
-
-    _reset () {
-      this.error = null
-    },
-    logout: async function () {
-  const supabase = useSupabaseClient()
-  await supabase.auth.signOut()
-  this.user = null
-  this.session = null
-}
+    _reset () { this.error = null },
   },
 })
 
-export const useAuthStoreRefs = () => storeToRefs(useAuthStore());
+export const useAuthStoreRefs = () => storeToRefs(useAuthStore())

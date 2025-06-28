@@ -65,7 +65,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useSupabaseClient, useSupabaseUser } from "#imports";
 import ProfileLayouts from "@/layouts/ProfileLayouts.vue";
 import DefaultInput from "~/components/Uikit/inputs/DefaultInput.vue";
 import DefaultSelect from "~/components/Uikit/inputs/DefaultSelect.vue";
@@ -74,7 +73,7 @@ import { useUserStore, useUserStoreRefs } from "~/store/useUserSrore";
 import { useAuthStoreRefs } from "~/store/useAuthStore";
 
 const { user: userAuth } = useAuthStoreRefs();
-const supabase = useSupabaseClient();
+
 const store = useUserStore();
 
 const avatarFile = ref<File | null>(null);
@@ -93,33 +92,33 @@ const timezoneOptions = [
   { label: "Россия, Новосибирск (+07:00)", value: "NOVT" },
 ];
 
-async function fetchUserFromStore() {
-  try {
-    const userData = await store.getUserById(userAuth.value.id);
-    if (userData.avatar) {
-      avatarPreview.value = userData.avatar;
-    }
-  } catch (error) {
-    console.error("Ошибка загрузки данных пользователя:", error);
-  }
-}
+// async function fetchUserFromStore() {
+//   try {
+//     const userData = await store.getUserById(userAuth.value.id);
+//     if (userData.avatar) {
+//       avatarPreview.value = userData.avatar;
+//     }
+//   } catch (error) {
+//     console.error("Ошибка загрузки данных пользователя:", error);
+//   }
+// }
 
 onMounted(() => {
-  fetchUserFromStore();
+  // fetchUserFromStore();
 });
 
 // 🖼️ Загрузка аватара
-async function uploadAvatar(file: File): Promise<string> {
-  const fileName = `avatars/${Date.now()}-${file.name}`;
-  const { error } = await supabase.storage
-    .from("avatars")
-    .upload(fileName, file, { upsert: true });
+// async function uploadAvatar(file: File): Promise<string> {
+//   const fileName = `avatars/${Date.now()}-${file.name}`;
+//   const { error } = await supabase.storage
+//     .from("avatars")
+//     .upload(fileName, file, { upsert: true });
 
-  if (error) throw new Error("Ошибка загрузки аватара: " + error.message);
+//   if (error) throw new Error("Ошибка загрузки аватара: " + error.message);
 
-  const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
-  return data.publicUrl;
-}
+//   const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
+//   return data.publicUrl;
+// }
 
 function onFileChange(event: Event) {
   const target = event.target as HTMLInputElement;
@@ -136,7 +135,7 @@ async function saveProfile() {
     let avatarUrl = "";
 
     if (avatarFile.value) {
-      avatarUrl = await uploadAvatar(avatarFile.value);
+      // avatarUrl = await uploadAvatar(avatarFile.value);
     }
 
     const updatedUser = {
@@ -144,7 +143,7 @@ async function saveProfile() {
       avatar: avatarUrl || avatarPreview.value || null,
     };
 
-    await store.createUser(updatedUser);
+    // await store.createUser(updatedUser);
     alert("Профиль сохранён!");
   } catch (err) {
     console.error(err);
