@@ -7,7 +7,12 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxtjs/tailwindcss",
     "@nuxt/icon",
+    'vue-yandex-maps/nuxt'
   ],
+  yandexMaps: {
+    apikey: process.env.YMAPS_API_KEY,
+    lang:   'ru_RU',
+  },
   runtimeConfig: {
     public: {
       SITE_URL: process.env.SITE_URL || 'https://space.gleede.ru/'
