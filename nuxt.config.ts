@@ -10,8 +10,7 @@ export default defineNuxtConfig({
     'vue-yandex-maps/nuxt'
   ],
   yandexMaps: {
-    apikey: process.env.YMAPS_API_KEY,
-    lang:   'ru_RU',
+    apikey: 'de0ee812-515f-4988-a580-639be65741a6',
   },
   runtimeConfig: {
     public: {

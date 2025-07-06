@@ -1,8 +1,8 @@
 <template>
   <div class="default-layout">
-    <DefaultHeader />
+    <DefaultHeader v-if="!isRouteMarketplaceMapsPage" />
     <NuxtPage />
-    <!-- <AuthModals /> -->
+
     <DefaultFooter />
     <transition name="fade-bg">
       <div v-if="isModalActive" class="page-bg" @click="closeAllModals"></div>
@@ -18,12 +18,19 @@ import DefaultHeader from "~/components/shared/Header.vue";
 import DefaultFooter from "~/components/shared/Footer.vue";
 import AuthModals from "~/components/modals/AuthModals.vue";
 import { useModalStore, useModalStoreRefs } from "~/store/useModalStore";
+import { useRoute } from "vue-router";
 
 const { modals } = useModalStoreRefs();
 const { closeAllModals } = useModalStore();
 
 const isModalActive = computed(() => {
   return Object.values(modals.value).some((isActive) => isActive);
+});
+
+const route = useRoute();
+
+const isRouteMarketplaceMapsPage = computed(() => {
+  return route.name === "map-spaces";
 });
 </script>
 

@@ -3,7 +3,7 @@
     class="CardPlace rounded-2xl bg-white overflow-hidden shadow-main font-plex"
     v-if="card"
   >
-    <div class="relative h-60 group">
+    <div class="relative group" :class="{ 'h-60': !short, 'h-32': short }">
       <IconButtons
         iconName="mdi-light:heart"
         :iconSize="24"
@@ -32,29 +32,41 @@
         class="absolute top-1/2 left-0 -translate-y-1/2 flex items-center justify-between z-10 w-full px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <div
-          :class="'prev-' + card.id"
-          class="next bg-white text-darkText w-10 h-10 flex items-center justify-center rounded-full swiper-button-disabled:opacity-50 swiper-button-disabled:cursor-not-allowed"
+          :class="[
+            'prev-' + card.id,
+            { 'w-10 h-10 ': !short, 'w-8 h-8': short },
+          ]"
+          class="next bg-white text-darkText flex items-center justify-center rounded-full swiper-button-disabled:opacity-50 swiper-button-disabled:cursor-not-allowed"
         >
-          <Icon name="line-md:arrow-left" :size="20" />
+          <Icon name="line-md:arrow-left" :size="short ? 20 : 14" />
         </div>
         <div
-          :class="'next-' + card.id"
-          class="prev bg-white text-darkText w-10 h-10 flex items-center justify-center rounded-full"
+          :class="[
+            'next-' + card.id,
+            { 'w-10 h-10 ': !short, 'w-8 h-8': short },
+          ]"
+          class="prev bg-white text-darkText flex items-center justify-center rounded-full"
         >
-          <Icon name="line-md:arrow-right" :size="20" />
+          <Icon name="line-md:arrow-right" :size="short ? 20 : 14" />
         </div>
       </div>
     </div>
 
-    <div class="px-6 pb-8 pt-6">
-      <div class="grid grid-cols-2 gap-2 mb-5">
-        <div>{{ card.acf.space.short_address }}</div>
+    <div
+      class=""
+      :class="{ 'px-6 pb-8 pt-6': !short, 'px-4 pb-6 pt-4': short }"
+    >
+      <div
+        class="flex items-center justify-between gap-2"
+        :class="{ 'mb-5': !short, 'mb-2': short }"
+      >
+        <div class="flex-grow">{{ card.acf.space.short_address }}</div>
         <ul class="flex items-center justify-end gap-2">
           <li class="flex items-center justify-start gap-1">
             <div class="icon"><Icon name="noto:star" /></div>
             <p>5.0</p>
           </li>
-          <li>2 отзыва</li>
+          <li v-if="!short">2 отзыва</li>
         </ul>
       </div>
 
@@ -69,8 +81,14 @@
         <h3 class="text-18 font-bold text-darkText">{{ card.title }}</h3>
       </div>
 
-      <div class="border-t border-[##eee] mt-6 pt-6">
-        <ul class="grid grid-cols-3 gap-4 mb-6">
+      <div
+        class=""
+        :class="{
+          'border-t border-[##eee] mt-6 pt-6': !short,
+          'mt-4 pt-4': short,
+        }"
+      >
+        <ul class="grid grid-cols-3 gap-4 mb-6" v-if="!short">
           <li
             v-for="(item, i) in card.acf.space.short_params.slice(0, 3)"
             :key="i"
@@ -100,6 +118,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 const props = defineProps<{
   card: any;
+  short: boolean;
 }>();
 
 const priceRange = computed(() => {

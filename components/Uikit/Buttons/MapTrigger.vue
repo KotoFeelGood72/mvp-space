@@ -3,6 +3,7 @@
     <img src="/assets/img/map.jpg" class="w-full" />
 
     <div
+      @click="router.push('/map-spaces')"
       class="absolute bottom-5 left-5 flex items-center justify-center px-12 py-4 bg-white shadow-custom-deep rounded-xl gap-3 font-semibold text-darkText cursor-pointer"
     >
       <Icon name="rivet-icons:map-pin-solid" :size="24" class="text-orange" />
@@ -13,4 +14,7 @@
 
 <script setup lang="ts">
 import Buttons from "./Buttons.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 </script>
