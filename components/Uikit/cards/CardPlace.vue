@@ -90,7 +90,9 @@
       >
         <ul class="grid grid-cols-3 gap-4 mb-6" v-if="!short">
           <li
-            v-for="(item, i) in card.acf.space.short_params.slice(0, 3)"
+            v-for="(item, i) in Array.isArray(card.acf.space.short_params)
+              ? card.acf.space.short_params.slice(0, 3)
+              : []"
             :key="i"
           >
             <span class="text-lightText text-[13px] block mb-1">{{

@@ -28,15 +28,16 @@ export default defineNuxtPlugin(() => {
   })
 
 
-  /* ---------------- request ---------------- */
-  api.interceptors.request.use((config: ExtConfig) => {
+api.interceptors.request.use((config: ExtConfig) => {
+  if (typeof window !== 'undefined') {
     const auth = useAuthStore()
     if (auth.access) {
       config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${auth.access}`
     }
-    return config
-  })
+  }
+  return config
+})
 
   /* --------------- response ---------------- */
   let isRefreshing = false

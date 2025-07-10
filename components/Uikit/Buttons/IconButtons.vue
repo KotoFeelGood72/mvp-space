@@ -7,7 +7,12 @@
   >
     <Icon :name="iconName" :size="iconSize" />
   </NuxtLink>
-  <button v-else type="button" class="icon-btn" @click="handleClick">
+  <button
+    v-else
+    type="button"
+    class="icon-btn flex items-center justify-center"
+    @click="handleClick"
+  >
     <Icon :name="iconName" :size="iconSize" />
   </button>
 </template>

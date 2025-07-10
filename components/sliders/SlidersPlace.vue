@@ -21,7 +21,7 @@
         }"
       >
         <swiper-slide v-for="(place, index) in places" :key="index"
-          ><CardPlace :card="place" />
+          ><CardPlace :card="place" :short="false" />
         </swiper-slide>
       </Swiper>
     </div>

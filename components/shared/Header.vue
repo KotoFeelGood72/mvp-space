@@ -11,7 +11,7 @@ const { user } = useAuthStoreRefs();
 const toggleProfileDropdown = ref<boolean>(false);
 
 const menuList = [
-  { menuLink: "/lofts", menuName: "Выбрать зал" },
+  { menuLink: "/spaces", menuName: "Выбрать зал" },
   { menuLink: "/basg", menuName: "Bash+" },
   { menuLink: "/sales", menuName: "Акции" },
   { menuLink: "/ideas", menuName: "Идеи" },

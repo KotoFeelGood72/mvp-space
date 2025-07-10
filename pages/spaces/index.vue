@@ -33,6 +33,7 @@
         v-for="(item, i) in places"
         :key="'places-item-' + i"
         :card="item"
+        :short="false"
       />
     </div>
   </div>
